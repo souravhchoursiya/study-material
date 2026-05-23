@@ -13,8 +13,8 @@
     
     <style>
         :root { --primary: #4F46E5; --primary-hover: #4338CA; --bg-color: #F8FAFC; --card-bg: #FFFFFF; --text-main: #0F172A; --text-muted: #64748B; --border: #E2E8F0; --danger: #EF4444; --danger-bg: #FEE2E2; --success: #10B981; --success-bg: #D1FAE5; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); height: 100vh; box-sizing: border-box; overflow: hidden; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
-        .container { background-color: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 450px; display: flex; flex-direction: column; max-height: 95vh; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); min-height: 100vh; box-sizing: border-box; overflow: hidden; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; color: var(--text-main); user-select: none;}
+        .container { background-color: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 99%;  display: flex; flex-direction: column; max-height: 95vh; }
         .scrollable { overflow-y: auto; padding-right: 5px; flex-grow: 1; }
         .scrollable::-webkit-scrollbar { width: 4px; } .scrollable::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
         .logo { display: block; margin: 0 auto 15px auto; width: 80px; }
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root" style="width: 90%;"></div>
     <script type="text/babel">
         function PortalApp() {
             const [view, setView] = React.useState('access');
