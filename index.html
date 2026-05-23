@@ -24,9 +24,9 @@
         body { 
             font-family: 'Inter', sans-serif; 
             background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); 
-            height: 100vh; /* Fixed height to prevent external scrolling */
+            /* UPDATED: Allows body to naturally scroll on very small screens so nothing gets cut off */
+            min-height: 100vh; 
             box-sizing: border-box; 
-            overflow: hidden; /* Hides external scrollbars */
             margin: 0; 
             padding: 20px; 
             display: flex; 
@@ -42,16 +42,11 @@
             border-radius: 16px; 
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); 
             width: 100%; 
-            box-sizing: border-box; /* Fixes the overflow issue */
+            max-width: 420px; 
+            box-sizing: border-box; 
             display: flex; 
             flex-direction: column; 
-            max-height: 92vh; /* Keeps it neatly inside the screen */
         }
-
-        .scrollable { overflow-y: auto; padding-right: 5px; flex-grow: 1; }
-        .scrollable::-webkit-scrollbar { width: 6px; } 
-        .scrollable::-webkit-scrollbar-track { background: transparent; }
-        .scrollable::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
         
         .logo { display: block; margin: 0 auto 15px auto; width: 85px; }
         h2 { text-align: center; margin: 0 0 5px 0; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px;}
@@ -73,7 +68,21 @@
         .msg.success { background: var(--success-bg); color: #065F46; border: 1px solid #A7F3D0; }
         
         .notes-area { background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 15px; animation: fadeIn 0.4s; }
-        .notes-header { text-align: center; font-weight: 600; color: var(--primary); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        .notes-header { text-align: center; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+        
+        /* NEW: Targeted scroll area just for the documents */
+        .file-list {
+            max-height: 180px; 
+            overflow-y: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+        .file-list::-webkit-scrollbar { width: 6px; }
+        .file-list::-webkit-scrollbar-track { background: transparent; }
+        .file-list::-webkit-scrollbar-thumb { background-color: #CBD5E1; border-radius: 10px; }
+
         .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E2E8F0; }
         .file-item:last-child { border-bottom: none; }
         .file-name { font-size: 14px; color: var(--text-main); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%; }
@@ -199,55 +208,57 @@
 
             return (
                 <div className="container">
-                    <div className="scrollable">
-                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/Delhi_University.svg/960px-Delhi_University.svg.png" className="logo" alt="Logo" />
-                        <h2>Study Portal</h2>
-                        <div className="subtitle">{appConfig.departmentName}</div>
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/b/b6/Delhi_University.svg/960px-Delhi_University.svg.png" className="logo" alt="Logo" />
+                    <h2>Study Portal</h2>
+                    <div className="subtitle">{appConfig.departmentName}</div>
 
-                        <div className="tabs">
-                            <div className={`tab ${view === 'access' ? 'active' : ''}`} onClick={() => switchView('access')}>Unlock Notes</div>
-                            <div className={`tab ${view === 'register' ? 'active' : ''}`} onClick={() => switchView('register')}>Register Here</div>
-                        </div>
+                    <div className="tabs">
+                        <div className={`tab ${view === 'access' ? 'active' : ''}`} onClick={() => switchView('access')}>Unlock Notes</div>
+                        <div className={`tab ${view === 'register' ? 'active' : ''}`} onClick={() => switchView('register')}>Register Here</div>
+                    </div>
 
-                        {status.msg && <div className={`msg ${status.type}`}>{status.msg}</div>}
+                    {status.msg && <div className={`msg ${status.type}`}>{status.msg}</div>}
 
-                        {view === 'register' && (
-                            <form onSubmit={handleRegister}>
-                                <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
-                                <input type="text" placeholder="Form Number" value={formNo} onChange={(e) => setFormNo(e.target.value)} required />
+                    {view === 'register' && (
+                        <form onSubmit={handleRegister}>
+                            <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                            <input type="text" placeholder="Form Number" value={formNo} onChange={(e) => setFormNo(e.target.value)} required />
+                            <button type="submit" disabled={loading || isFetchingConfig}>
+                                {loading ? <div className="spinner"></div> : 'Complete Registration'}
+                            </button>
+                        </form>
+                    )}
+
+                    {view === 'access' && (
+                        <div>
+                            <form onSubmit={handleAccess}>
+                                <select 
+                                    value={subject} 
+                                    onChange={(e) => setSubject(e.target.value)} 
+                                    disabled={isFetchingConfig || loading}
+                                    required
+                                >
+                                    {isFetchingConfig ? (
+                                        <option value="">Connecting to secure server...</option>
+                                    ) : (
+                                        availableSubjects.map((sub, index) => (
+                                            <option key={index} value={sub}>{sub}</option>
+                                        ))
+                                    )}
+                                </select>
+                                
+                                <input type="text" placeholder="Enter Form Number" value={formNo} onChange={(e) => setFormNo(e.target.value)} required />
                                 <button type="submit" disabled={loading || isFetchingConfig}>
-                                    {loading ? <div className="spinner"></div> : 'Complete Registration'}
+                                    {loading ? <div className="spinner"></div> : 'Access Material'}
                                 </button>
                             </form>
-                        )}
 
-                        {view === 'access' && (
-                            <div>
-                                <form onSubmit={handleAccess}>
-                                    <select 
-                                        value={subject} 
-                                        onChange={(e) => setSubject(e.target.value)} 
-                                        disabled={isFetchingConfig || loading}
-                                        required
-                                    >
-                                        {isFetchingConfig ? (
-                                            <option value="">Connecting to secure server...</option>
-                                        ) : (
-                                            availableSubjects.map((sub, index) => (
-                                                <option key={index} value={sub}>{sub}</option>
-                                            ))
-                                        )}
-                                    </select>
+                            {notesData && (
+                                <div className="notes-area">
+                                    <div className="notes-header">{notesData.subjectFetched} Documents</div>
                                     
-                                    <input type="text" placeholder="Enter Form Number" value={formNo} onChange={(e) => setFormNo(e.target.value)} required />
-                                    <button type="submit" disabled={loading || isFetchingConfig}>
-                                        {loading ? <div className="spinner"></div> : 'Access Material'}
-                                    </button>
-                                </form>
-
-                                {notesData && (
-                                    <div className="notes-area">
-                                        <div className="notes-header">{notesData.subjectFetched} Documents</div>
+                                    {/* UPDATED: Independent scrolling area just for files */}
+                                    <div className="file-list">
                                         {notesData.notes.length === 0 ? (
                                             <div style={{textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)'}}>No files currently available for this subject.</div>
                                         ) : (
@@ -261,20 +272,20 @@
                                             ))
                                         )}
                                     </div>
-                                )}
-                            </div>
-                        )}
-
-                        <div style={{ marginTop: '25px', textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>
-                            Need Help? Contact:{' '}
-                            {isFetchingConfig ? (
-                                <span>Loading...</span>
-                            ) : (
-                                <a href={`https://wa.me/${appConfig.crPhone}?text=Hi%20${appConfig.crName},%20I%20am%20having%20trouble%20with%20the%20study%20portal.`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>
-                                    {appConfig.crName} (WhatsApp)
-                                </a>
+                                </div>
                             )}
                         </div>
+                    )}
+
+                    <div style={{ marginTop: '25px', textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>
+                        Need Help? Contact:{' '}
+                        {isFetchingConfig ? (
+                            <span>Loading...</span>
+                        ) : (
+                            <a href={`https://wa.me/${appConfig.crPhone}?text=Hi%20${appConfig.crName},%20I%20am%20having%20trouble%20with%20the%20study%20portal.`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>
+                                {appConfig.crName} (WhatsApp)
+                            </a>
+                        )}
                     </div>
                     
                     <div className="footer">
