@@ -1,2 +1,0 @@
-# study-material
-Study Material
