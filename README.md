@@ -29,6 +29,6 @@ Once registered, you can unlock folders for any available subject.
 
 ## 🛠️ Need Help?
 
-If you experience any issues (e.g., your Form Number isn't working, or you are having trouble downloading a file), please use the **"Need Help? Contact CR"** link at the bottom of the portal. 
+If you experience any issues (e.g., your Form Number isn't working, or you are having trouble downloading a file), please use the **"Need Help? Contact"** link at the bottom of the portal. 
 
-Clicking the link will automatically open WhatsApp with a pre-filled message directed to your Class Representative.
+Clicking the link will automatically open WhatsApp with a pre-filled message directed to Representative.
